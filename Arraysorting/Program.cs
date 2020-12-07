@@ -7,21 +7,45 @@ namespace Arraysorting {
 		static void Main(string[] args) {
 			Program UpperClass = new Program();
 
-			string[] nameList = { "John","Bo","Anton","Keld","Benny","Egon","Yvonne","Børge","Niels","Åge","Allan","Ib","Carsten","Ellen","Alice","Thor","Henrik","Johnny","Lars","Leif","Rene","Ole","Poul","Kamilla","Tove","Winnie","Claus","Klaus","Grit","Jens","Elvis"};
-			string filePath = @"C:\Users\Philip\OneDrive - TEC\Skole\School Programming\C#\C_drev\FileHandlerFolder\file.txt";
+			string inputFile = @"C:\Users\Philip\OneDrive - TEC\Skole\School Programming\C#\C_drev\FileHandlerFolder\testvector.txt";
+			string outputFile = @"C:\Users\Philip\OneDrive - TEC\Skole\School Programming\C#\C_drev\FileHandlerFolder\file.txt";
 
+			string[] nameList = UpperClass.FileLoad(inputFile);
 			string[] list = UpperClass.ListSort(nameList);
+
 
 			foreach (string item in list) {
 				Console.WriteLine(item);
 			}
 
-			UpperClass.ToFile(list, filePath);
+			UpperClass.ToFile(list, outputFile);
 
 		}
 
+		// the following function spilts the lines of the file and further splits the elements of the line and appends that to a new array, which is returned.
+		public string[] FileLoad(string file) {
+
+			string[] lines = File.ReadAllLines(file);
+
+			List<string> stringInput = new List<String>();
+
+			for (int i = 0; i < lines.GetLength(0); i++) {
+				string[] fields = lines[i].Split(new char[] { ',', ';', ':', '\t' });
+
+				stringInput.AddRange(fields);
+			}
+
+			string[] endArray = stringInput.ToArray();
+
+			return endArray;
+		}
+
+
+		
+
 		public string[] ListSort(string[] array) {
 
+			// this ensures the order of the alphabet.
 			Dictionary<char, int> alphabet = new Dictionary<char, int>() {
 				{ 'a', 1 },
 				{ 'b', 2 },
@@ -66,6 +90,17 @@ namespace Arraysorting {
 						array[i + 1] = temp;
 
 					}
+
+					// the following code also switches the names depending on the second charater, if the first is the same.
+					if (alphabet[array[i].ToLower()[0]] == alphabet[array[i + 1].ToLower()[0]]) {
+						if (alphabet[array[i].ToLower()[1]] > alphabet[array[i + 1].ToLower()[1]]) {
+							string temp = array[i];
+							array[i] = array[i + 1];
+							array[i + 1] = temp;
+						}
+					}
+
+
 				}
 			}
 			return array;
@@ -76,30 +111,16 @@ namespace Arraysorting {
 
 			StreamWriter StreamW = new StreamWriter(file);
 
-			StreamW.Write(array);
+			foreach (string item in array) {
+				StreamW.Write(item + "\n");
+			}
 
 			StreamW.Flush();
 			StreamW.Close();
 
+			Console.WriteLine("\nArray was written to file.");
 
-		}
 
-		public static void write(string file, string[] arrayInput) {
-			StreamWriter Stream = new StreamWriter(file, append: true);
-
-			for (int i = 0; i < arrayInput.Length; i++) {
-				if (i < arrayInput.Length - 1) {
-					Stream.Write(arrayInput[i] + ",");
-				}
-				else {
-					Stream.Write(arrayInput[i]);
-				}
-			}
-			// We demand that the built up cache is written to memory by asking it to clear the cache, then we close.
-			Stream.Flush();
-			Stream.Close();
-
-			Console.WriteLine($"Names written: {arrayInput.Length}");
 		}
 
 
